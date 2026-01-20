@@ -16,24 +16,22 @@ def get_atb_promotions():
     soup = BeautifulSoup(response.text, 'html.parser')
     products = []
 
-    # Шукаємо картки товарів (селектори можуть змінюватися залежно від коду сайту)
-    items = soup.find_all('article', class_='promo-inventory-item')
+# Оновлений блок пошуку в parser.py
+items = soup.find_all('div', class_='promo-inventory-item') # спробуйте div замість article
 
-    for item in items:
-        try:
-            name = item.find('a', class_='promo-inventory-item__title').text.strip()
-            price_integer = item.find('span', class_='price__main').text.strip()
-            price_fraction = item.find('span', class_='price__cents').text.strip()
-            full_price = f"{price_integer}.{price_fraction}"
-            
-            products.append({
-                "name": name,
-                "price": float(full_price)
-            })
-        except AttributeError:
-            continue
+for item in items:
+    try:
+        # Більш гнучкий пошук назви та ціни
+        name_tag = item.find('a', class_='promo-inventory-item__title') or item.find('div', class_='title')
+        price_int_tag = item.find('span', class_='price__main')
+        price_frac_tag = item.find('span', class_='price__cents')
 
-    return products
+        if name_tag and price_int_tag:
+            name = name_tag.text.strip()
+            price = f"{price_int_tag.text.strip()}.{price_frac_tag.text.strip() if price_frac_tag else '00'}"
+            products.append({"name": name, "price": float(price)})
+    except Exception as e:
+        print(f"Помилка при обробці товару: {e}")
 
 # Зберігаємо результат у JSON файл, який зможе прочитати ваш HTML
 promo_data = get_atb_promotions()
@@ -44,4 +42,5 @@ print(f"Знайдено {len(promo_data)} акційних товарів. Да
 
 import time
 # ... у циклі додайте:
+
 time.sleep(1) # пауза 1 секунда між сторінками
