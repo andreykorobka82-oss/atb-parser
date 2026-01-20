@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Акційний кошик АТБ</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1 { color: #e30613; text-align: center; }
+        .product-list, .cart { margin-bottom: 20px; }
+        .item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; align-items: center; }
+        button { background: #00569c; color: white; border: none; padding: 5px 15px; cursor: pointer; border-radius: 5px; }
+        button:hover { background: #003d70; }
+        .total { font-size: 1.5em; font-weight: bold; text-align: right; color: #e30613; }
+        .cart-item { color: #333; font-style: italic; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🛒 Мій Акційний Список (АТБ)</h1>
+    
+    <div class="product-list">
+        <h3>Доступні акції:</h3>
+        <div class="item">
+            <span>Кава Nescafe Gold (310.90 грн)</span>
+            <button onclick="addToCart('Кава Nescafe', 310.90)">Додати</button>
+        </div>
+        <div class="item">
+            <span>Чай Lovare (40.90 грн)</span>
+            <button onclick="addToCart('Чай Lovare', 40.90)">Додати</button>
+        </div>
+        <div class="item">
+            <span>Captain Morgan 0.5л (269.00 грн)</span>
+            <button onclick="addToCart('Captain Morgan', 269.00)">Додати</button>
+        </div>
+        <div class="item">
+            <span>Шоколад Millennium (44.90 грн)</span>
+            <button onclick="addToCart('Шоколад Millennium', 44.90)">Додати</button>
+        </div>
+    </div>
+
+    <hr>
+
+    <div class="cart">
+        <h3>Ваш кошик:</h3>
+        <div id="cart-items"></div>
+    </div>
+
+    <div class="total">Разом: <span id="total-price">0.00</span> грн</div>
+    <button onclick="clearCart()" style="background: #666; margin-top: 10px;">Очистити кошик</button>
+</div>
+
+<script>
+// Замість ручного додавання, завантажуємо дані з JSON
+async function loadPromo() {
+    const response = await fetch('atb_data.json');
+    const products = await response.json();
+    
+    const listElement = document.querySelector('.product-list');
+    listElement.innerHTML = '<h3>Акції згенеровані автоматично:</h3>';
+
+    products.forEach(prod => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'item';
+        itemDiv.innerHTML = `
+            <span>${prod.name} (${prod.price} грн)</span>
+            <button onclick="addToCart('${prod.name}', ${prod.price})">Додати</button>
+        `;
+        listElement.appendChild(itemDiv);
+    });
+}
+loadPromo();
+</script>
+
+</body>
+</html>
