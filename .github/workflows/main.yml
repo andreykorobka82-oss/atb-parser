@@ -1,0 +1,32 @@
+name: Update ATB Data
+
+on:
+  schedule:
+    - cron: '0 7 * * 2,3' # Запуск щовівторка та щосереди о 07:00 UTC
+  workflow_dispatch:      # Дозволяє запускати вручну кнопкою
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: pip install requests beautifulsoup4
+
+      - name: Run parser
+        run: python parser.py
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "GitHub Action"
+          git config --global user.email "action@github.com"
+          git add atb_data.json
+          git commit -m "Update prices" || exit 0
+          git push
